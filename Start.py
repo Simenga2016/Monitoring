@@ -32,7 +32,7 @@ info = (cursor.execute("SELECT * FROM settings")).fetchall()
 if not (info): #Add one request of each type to Settings if it's empty
     query = '"Server": "f0741017.xsph.ru","Port": 22,"Login": "f0741017_TestBD","Password": "f0741017_TestBD","DB" : "f0741017_TestBD","Query" : "SELECT * FROM test WHERE num<20","Tunel" : 1,"Tunel_pass" : "tufaecitak","Tunel_log" : "f0741017"'
     execute_query(settings,
-                  f"INSERT INTO settings (type,server,query,time_limit,time_out,last_time,project) VALUES (1,'f0741017.xsph','{query}',10,250,'{datetime.datetime.now()}','Test Project')")
+                  f"INSERT INTO settings (type,server,query,time_limit,time_out,last_time,project) VALUES (1,'f0741017.xsph','{query}',10,1500,'{datetime.datetime.now()}','Test Project')")
     query = '"Server": "google.com","Count": 7'
     execute_query(settings,
                   f"INSERT INTO settings (type,server,query,time_limit,time_out,last_time,project) VALUES (2,'google','{query}',1,200,'{datetime.datetime.now()}','Test Google Project')")
@@ -46,7 +46,7 @@ if not (info): #Add one request of each type to Settings if it's empty
                   f",'{datetime.datetime.now()}','Test Nginx Project')")
     query = '"Server": "WRONGf0741017.xsph.ru","Port": 22,"Login": "WRONGf0741017_TestBD","Password": "WRONGf0741017_TestBD","DB" : "WRONGf0741017_TestBD","Query" : "SELECT * FROM test WHERE num<20","Tunel" : 1,"Tunel_pass" : "tufaecitak","Tunel_log" : "f0741017"'
     execute_query(settings,
-                  f"INSERT INTO settings (type,server,query,time_limit,time_out,last_time,project) VALUES (1,'f0741017.xsph','{query}',10,250,'{datetime.datetime.now()}','Test Project')")
+                  f"INSERT INTO settings (type,server,query,time_limit,time_out,last_time,project) VALUES (1,'f0741017.xsph','{query}',10,1200,'{datetime.datetime.now()}','Test Project')")
     query = '"Server": "WRONGgoogle.com","Count": 7'
     execute_query(settings,
                   f"INSERT INTO settings (type,server,query,time_limit,time_out,last_time,project) VALUES (2,'google','{query}',1,200,'{datetime.datetime.now()}','Test Google Project')")
