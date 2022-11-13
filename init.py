@@ -12,7 +12,7 @@ if os.path.exists(f"{os.path.abspath(__file__).replace(os.path.basename(__file__
 
 if __name__ == '__main__':
 
-    # After launching this application, you should write to the @SellwingroupMonitorBot bot to register.
+    # After launching this application, you should write to the @SellwingroupMonitorBot to register.
     # It is enough to do it only once.
     # After 60s or first message registration will be closed
     # In the future, all registered users will receive error messages while the program is running.
@@ -32,19 +32,14 @@ if __name__ == '__main__':
         bot.stop_polling()
 
 
-    print(1)
-    bot.polling(timeout=60, long_polling_timeout=60)
-    print(2)
+    bot.polling(timeout=4, long_polling_timeout=4)
     telebot_users = create_connection(
         f"{os.path.abspath(__file__).replace(os.path.basename(__file__), '')}/Users.sqlite")
     cursor = telebot_users.cursor()
     users = cursor.execute('SELECT user_id FROM user').fetchall()
 
     print('Start')
-    ppp = 0
     while 1:
-        ppp += 1
-        print('Цикл ', ppp)
 
         Errors_to_send = []
 
@@ -82,7 +77,9 @@ if __name__ == '__main__':
 
         for user in users:
             for error in Errors_to_send:
-                bot.send_message(f'{user[0]}', f'{error}')
+                try:
+                    bot.send_message(f'{user[0]}', f'{error}')
+                except:
+                    pass
                 sleep(1)
-            sleep(1)
         sleep(10)

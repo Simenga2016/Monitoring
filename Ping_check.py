@@ -4,6 +4,11 @@ import multiprocessing
 import datetime
 from Func import *
 
+def create_error_message(settings_id,datatime,server,error):
+    message = f"Обмен пакетами с [{server}]: \n" \
+              f"{error}"
+    error_message = {"settings_id": settings_id, "error_time": datatime, "log": message}
+    return (error_message)
 
 def create_ping_error_message(settings_id, datatime, server, data):
     send = 0
@@ -38,7 +43,10 @@ def Ping_check():
             4] * 60) or ((datetime.datetime.now() - datetime.datetime.strptime(serv[6], '%Y-%m-%d %H:%M:%S.%f')).days):
             query_settings = loads('{' + serv[3] + '}')
             timeout = serv[5] / 1000
-            res = pythonping.ping(query_settings['Server'], count=query_settings['Count'], timeout=timeout)
+            try:
+                res = pythonping.ping(query_settings['Server'], count=query_settings['Count'], timeout=timeout)
+            except Exception as e:
+                Error_messages.append(create_error_message(serv[0], datetime.datetime.now(), serv[2], e))
             if (res.stats_success_ratio != 1):
                 Error_messages.append(create_ping_error_message(serv[0], datetime.datetime.now(), serv[2], res))
             execute_query(settings, f"UPDATE settings SET last_time = '{datetime.datetime.now()}' WHERE id = {serv[0]}")

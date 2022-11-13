@@ -1,8 +1,0 @@
-{
-    "Server": "ip",
-    "Port": 5432,
-    "Login": "user",
-    "Password": "1234",
-    "DB" : "messages",
-    "Query" : "SELECT * FROM test WHERE num<20"
-}
