@@ -3,7 +3,6 @@ from Start import *
 
 from json import loads
 from sshtunnel import SSHTunnelForwarder
-from time import sleep
 import MySQLdb
 from MySQLdb import Error, MySQLError
 import multiprocessing

@@ -1,19 +1,17 @@
 ## Some functions for local SQLite DB
 
-import sqlite3
-from sqlite3 import Error
 import os
+import psycopg2
+from psycopg2 import Error
 
 
-# Create connection to SQLite database
-def create_connection(path):
+def create_PostgreSQL_connection(db, user='postgres', password='1111', host='localhost', port=5432):
     connection = None
     try:
-        connection = sqlite3.connect(path)
+        connection = psycopg2.connect(database=db, user=user, password=password, host=host, port=port)
     except Error as e:
         print(f"Connection error!  {e}")
     return connection
-
 
 # Change of SQLite database
 def execute_query(connection, query):
@@ -22,7 +20,8 @@ def execute_query(connection, query):
         cursor.execute(query)
         connection.commit()
     except Error as e:
-        print(f"Execution error! {e}")
+        pass
+        # print(f"Execution error! {e}")
 
 
 # Create sql-request to add new line into database
@@ -41,24 +40,19 @@ def add_to_db(table, text_table, args, what):
     line = create_insert_line(text_table, args, what)
     execute_query(table, line)
 
-#Create error message for last line in Error_history SQLite database
-def create_error_message():
-    type = create_connection(f"{os.path.abspath(__file__).replace(os.path.basename(__file__), '')}/Type.sqlite")
-    settings = create_connection(f"{os.path.abspath(__file__).replace(os.path.basename(__file__), '')}/Settings.sqlite")
-    error_history = create_connection(
-        f"{os.path.abspath(__file__).replace(os.path.basename(__file__), '')}/Error_history.sqlite")
-    error_cursor = error_history.cursor()
-    error_id = (error_cursor.execute('SELECT id FROM error_history ORDER BY id DESC LIMIT 1')).fetchall()[0][0]
+
+def create_postgreSQL_error_message():
+    DB = create_PostgreSQL_connection('MainDB')
+    cursor = DB.cursor()
+    error_id = (cursor.execute('SELECT id FROM error_history ORDER BY id DESC LIMIT 1')).fetchall()[0][0]
     settings_id = \
-        (error_cursor.execute('SELECT settings_id FROM error_history ORDER BY id DESC LIMIT 1')).fetchall()[0][0]
-    error_time = (error_cursor.execute('SELECT error_time FROM error_history ORDER BY id DESC LIMIT 1')).fetchall()[0][
+        (cursor.execute('SELECT settings_id FROM error_history ORDER BY id DESC LIMIT 1')).fetchall()[0][0]
+    error_time = (cursor.execute('SELECT error_time FROM error_history ORDER BY id DESC LIMIT 1')).fetchall()[0][
         0]
-    settings_cursor = settings.cursor()
-    project = settings_cursor.execute(f'SELECT project FROM settings where id = {settings_id}').fetchall()[0][0]
-    server = settings_cursor.execute(f'SELECT server FROM settings where id = {settings_id}').fetchall()[0][0]
-    type_id = settings_cursor.execute(f'SELECT type FROM settings where id = {settings_id}').fetchall()[0][0]
-    type_cursor = type.cursor()
-    name = type_cursor.execute(f'SELECT name FROM type where id = {type_id}').fetchall()[0][0]
+    project = cursor.execute(f'SELECT project FROM settings where id = {settings_id}').fetchall()[0][0]
+    server = cursor.execute(f'SELECT server FROM settings where id = {settings_id}').fetchall()[0][0]
+    type_id = cursor.execute(f'SELECT type FROM settings where id = {settings_id}').fetchall()[0][0]
+    name = cursor.execute(f'SELECT name FROM type where id = {type_id}').fetchall()[0][0]
     message = f"!!!Внимание!!! Сбой в программном обеспечение!\n" \
               f"Error id: {error_id}\n" \
               f"Проект: {project}\n" \
@@ -67,13 +61,10 @@ def create_error_message():
               f"Server: {server}"
     return message
 
-#Send message to TG-bot //ToDo
-def send_to_TG(message):
-    print(message)
-
-# Add error to Error_history SQLite DB
 def add_to_history(error):
-    error_history = create_connection(
-        f"{os.path.abspath(__file__).replace(os.path.basename(__file__), '')}/Error_history.sqlite")
+    error_history = create_PostgreSQL_connection("main_db")
     add_to_db(error_history, 'error_history', 'settings_id, error_time, log',
               f'{error["settings_id"]}, "{str(error["error_time"])}", "{error["log"]}"')
+
+if __name__ == '__main__':
+    print('What are you doing here?')

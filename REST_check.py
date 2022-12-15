@@ -22,15 +22,21 @@ def create_api_time_error_message(settings_id, datatime, server):
 def Rest_check():
     Error_messages = []
 
-    settings = create_connection(f"{os.path.abspath(__file__).replace(os.path.basename(__file__), '')}/Settings.sqlite")
-    settings_info = settings.execute('SELECT * FROM Settings WHERE type=3 OR type=4')
+    settings = psycopg2.connect(database="main_db",
+                                user="postgres",
+                                password="1111",
+                                host="127.0.0.1",
+                                port="5432")
+    cursor = settings.cursor()
+    settings_info = cursor.execute('SELECT * FROM Settings WHERE type=3 OR type=4')
 
-    for api in settings_info:
-        if ((datetime.datetime.now() - datetime.datetime.strptime(api[6], '%Y-%m-%d %H:%M:%S.%f')).seconds > api[
-            4] * 60) or (
-                (datetime.datetime.now() - datetime.datetime.strptime(api[6], '%Y-%m-%d %H:%M:%S.%f')).days):
-            query_settings = loads('{' + api[3] + '}')
-            timeout = api[5] / 1000
+    for api in cursor.fetchall():
+        print(api)
+        if ((datetime.datetime.now() - datetime.datetime.strptime(str(api[6]), '%Y-%m-%d %H:%M:%S.%f')).seconds > api[
+            4] * 1) or (
+                (datetime.datetime.now() - datetime.datetime.strptime(str(api[6]), '%Y-%m-%d %H:%M:%S.%f')).days):
+            query_settings = api[3]
+            timeout = api[5] * 1000
             URL = str(query_settings['Server'])
             try:
                 request = requests.get(URL, timeout=timeout)
@@ -44,4 +50,7 @@ def Rest_check():
 
 
 if __name__ == '__main__':
-    print(Rest_check())
+    Mes = Rest_check()
+    print('|___|')
+    for i in Mes:
+        print(i)
